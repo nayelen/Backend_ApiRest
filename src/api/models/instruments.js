@@ -6,6 +6,7 @@ const instrumentSchema = new mongoose.Schema(
     image: { type: String, required: true },
     price: { type: Number, required: true },
     category: { type: String, required: true, enum: ["frotada", "pulsada", "percutida", "madera", "metal", "determinada", "indeterminada"] },
+    verified: { type: Boolean, required: true, default: false },
   },
   {
     timestamps: true,

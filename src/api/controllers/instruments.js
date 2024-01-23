@@ -2,12 +2,21 @@ const Instrument = require("../models/instruments")
 
 const getInstrument = async (req, res, next) => {
   try {
-    const instruments = await Instrument.find();
+    const instruments = await Instrument.find({ verified: true });
     return res.status(200).json(instruments);
   } catch (error) {
     return res.status(400).json("Error en la solicitud");
   }
-}
+};
+
+const getInstrumentAdmin = async (req, res, next) => {
+  try {
+    const instruments = await Instrument.find({ verified: false });
+    return res.status(200).json(instruments);
+  } catch (error) {
+    return res.status(400).json("Error en la solicitud");
+  }
+};
 
 const getInstrumentByCategory = async (req, res, next) => {
   try {
@@ -31,7 +40,7 @@ const getInstrumentByPrice = async (req, res, next) => {
 
 const getInstrumentById = async (req, res, next) => {
   try {
-    const { id } = req.params
+    const { id } = req.params;
     const instrument = await Instrument.findById(id);
     return res.status(200).json(instrument);
   } catch (error) {
@@ -41,18 +50,25 @@ const getInstrumentById = async (req, res, next) => {
 const postInstrument = async (req, res, next) => {
   try {
     const newInstrument = new Instrument(req.body);
-    const instrumentSaved = await newInstrument.save()
+
+    if (req.user.rol === "admin") {
+      newInstrument.verified = true;
+    } else {
+      newInstrument.verified = false;
+    };
+
+    const instrumentSaved = await newInstrument.save();
     return res.status(201).json(instrumentSaved);
   } catch (error) {
     return res.status(400).json("Error en la solicitud");
   }
-}
+};
 const putInstrument = async (req, res, next) => {
   try {
     const { id } = req.params;
     const newInstrument = new Instrument(req.body);
     newInstrument._id = id;
-    const instrumentUpdated = await Instrument.findByIdAndUpdate(id, newInstrument, { new: true, })
+    const instrumentUpdated = await Instrument.findByIdAndUpdate(id, newInstrument, { new: true })
     return res.status(200).json(instrumentUpdated)
   } catch (error) {
     return res.status(400).json("Error en la solicitud");
@@ -68,5 +84,5 @@ const deleteInstrument = async (req, res, next) => {
   }
 }
 module.exports = {
-  getInstrument, getInstrumentByCategory, getInstrumentByPrice, getInstrumentById, postInstrument, putInstrument, deleteInstrument
+  getInstrument, getInstrumentByCategory, getInstrumentByPrice, getInstrumentById, postInstrument, putInstrument, deleteInstrument, getInstrumentAdmin
 }
